@@ -1,0 +1,10 @@
+fastapi
+uvicorn
+python-multipart
+tensorflow
+numpy
+pillow
+pdf2image
+python-docx
+python-dotenv
+loguru
