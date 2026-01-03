@@ -1,9 +1,12 @@
 import os
 import shutil
+import uuid
+
 from fastapi import APIRouter, UploadFile, File, HTTPException
-from app.utils.logger import log
+
 from app.config import settings
 from app.services.inference import run_inference
+from app.utils.logger import log
 from app.utils.file_converter import (
     UnsupportedFileTypeError,
     FileConversionError
@@ -27,17 +30,47 @@ async def predict(file: UploadFile = File(...)):
             detail="No file uploaded"
         )
 
-    file_path = os.path.join(UPLOAD_DIR, file.filename)
+    log.info(f"Received file: {file.filename}")
+
+    # -----------------------------
+    # File size validation
+    # -----------------------------
+    file.file.seek(0, os.SEEK_END)
+    file_size_mb = file.file.tell() / (1024 * 1024)
+    file.file.seek(0)
+
+    if file_size_mb > settings.MAX_UPLOAD_SIZE_MB:
+        log.warning(
+            f"File too large: {file.filename} ({file_size_mb:.2f} MB)"
+        )
+        raise HTTPException(
+            status_code=413,
+            detail="Uploaded file exceeds size limit"
+        )
+
+    # -----------------------------
+    # Safe unique filename
+    # -----------------------------
+    unique_filename = f"{uuid.uuid4()}_{file.filename}"
+    file_path = os.path.join(UPLOAD_DIR, unique_filename)
 
     try:
         # Save uploaded file to disk
         with open(file_path, "wb") as buffer:
             shutil.copyfileobj(file.file, buffer)
 
+        log.info(f"File saved to disk: {file_path}")
+
         # Run inference pipeline
         result = run_inference(
             file_path=file_path,
             filename=file.filename
+        )
+
+        log.info(
+            f"Inference completed | "
+            f"Prediction={result['prediction']} | "
+            f"Confidence={result['confidence']}"
         )
 
         return {
@@ -46,24 +79,28 @@ async def predict(file: UploadFile = File(...)):
         }
 
     except UnsupportedFileTypeError as e:
+        log.warning(str(e))
         raise HTTPException(
             status_code=415,
             detail=str(e)
         )
 
     except FileConversionError as e:
+        log.error(str(e))
         raise HTTPException(
             status_code=400,
             detail=str(e)
         )
 
-    except Exception as e:
+    except Exception:
+        log.exception("Unexpected inference failure")
         raise HTTPException(
             status_code=500,
-            detail=f"Inference failed: {str(e)}"
+            detail="Internal server error during inference"
         )
 
     finally:
         # Cleanup uploaded file
         if os.path.exists(file_path):
             os.remove(file_path)
+            log.info(f"Cleaned up file: {file_path}")
