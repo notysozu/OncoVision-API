@@ -9,6 +9,12 @@ The system accepts file uploads of multiple types, safely converts them
 into CNN-compatible images, and performs inference using a pretrained
 model.
 <br />
+```bash
+ cd ./backend/
+```
+```bash
+uvicorn app.main:app --reload```
+<br />
 ```
   --------------------------------------------------
   Key Characteristics
@@ -51,35 +57,23 @@ are converted into images before inference.
 <br />
 
 ```
-backend/
+OncoVision-API/
+├── backend/
+│   ├── __init__.py
+│   ├── app/
+│   │   ├── __init__.py
+│   │   ├── api/
+│   │   ├── model/
+│   │   ├── services/
+│   │   ├── utils/
+│   │   ├── config.py
+│   │   └── main.py
+│   ├── model_weights/
+│   └── temp_uploads/
 │
-├── app/
-│   ├── main.py                # FastAPI entry point
-│   ├── config.py              # Settings (paths, model name)
-│   │
-│   ├── api/
-│   │   ├── routes.py           # API endpoints
-│   │   └── schemas.py          # Request/Response models
-│   │
-│   ├── model/
-│   │   ├── cnn_model.py        # CNN architecture
-│   │   ├── load_model.py       # Load trained model
-│   │   └── predict.py          # Prediction logic
-│   │
-│   ├── utils/
-│   │   ├── file_converter.py
-│   │   ├── image_utils.py      # Resize, normalize, tensor conversion
-│   │   └── logger.py
-│   │
-│   └── services/
-│       └── inference.py        # Business logic wrapper
-│
-├── model_weights/
-│   └── cancer_cnn.h5           # Saved model
-│
-├── requirements.txt
+├── venv/
 ├── README.md
-└── .env
+└── requirements.txt
 ```
 
 # Academic Disclaimer
