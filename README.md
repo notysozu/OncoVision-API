@@ -13,13 +13,13 @@ model.
   --------------------------------------------------
   Key Characteristics
   --------------------------------------------------
-  - Backend only (FastAPI) - CNN-based inference (no
-  transformers, no LLMs) - Fully offline (no cloud
-  APIs) - File-based input only (multipart upload) -
-  Supports images and documents - Beginner-friendly
-  but architecturally clean - Academic +
-  production-aligned design
-
+  - Backend only (FastAPI) 
+  - CNN-based inference (no transformers, no LLMs) 
+  - Fully offline (no cloud APIs) 
+  - File-based input only (multipart upload) 
+  - Supports images and documents 
+  - Beginner-friendly but architecturally clean 
+  - Academic + production-aligned design
   --------------------------------------------------
 ```
 # Architecture Overview
@@ -35,13 +35,17 @@ are converted into images before inference.
   --------------------------------------------------
   Images: JPG, JPEG, PNG Documents: PDF, DOCX
   Others: Rejected
-
   --------------------------------------------------
 ```
 # API Response Format
 ```
-{ “status”: “success”, “file_type”: “pdf”, “images_processed”: 3,
-“prediction”: “Cancer Detected”, “confidence”: 0.87 }
+{
+ “status”: “success”,
+ “file_type”: “pdf”,
+ “images_processed”: 3,
+ “prediction”: “Cancer Detected”,
+ “confidence”: 0.87 
+}
 ```
 <img src="https://github.com/notysozu/web-assets/blob/main/OncoVision/flowchart.png?raw=true" alt="Card Image - PC Version" style="width: 100%; max-height: 200px; object-fit: cover; border-radius: 5px;">
 <br />
