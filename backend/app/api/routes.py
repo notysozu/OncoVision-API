@@ -24,7 +24,10 @@ async def predict(file: UploadFile = File(...)):
     Accept a file upload and run cancer detection.
     """
 
-    if not file.filename:
+    # -----------------------------
+    # Basic validation
+    # -----------------------------
+    if not file or not file.filename:
         raise HTTPException(
             status_code=400,
             detail="No file uploaded"
@@ -49,19 +52,23 @@ async def predict(file: UploadFile = File(...)):
         )
 
     # -----------------------------
-    # Safe unique filename
+    # Generate safe unique filename
     # -----------------------------
     unique_filename = f"{uuid.uuid4()}_{file.filename}"
     file_path = os.path.join(UPLOAD_DIR, unique_filename)
 
     try:
-        # Save uploaded file to disk
+        # -----------------------------
+        # Save uploaded file
+        # -----------------------------
         with open(file_path, "wb") as buffer:
             shutil.copyfileobj(file.file, buffer)
 
         log.info(f"File saved to disk: {file_path}")
 
+        # -----------------------------
         # Run inference pipeline
+        # -----------------------------
         result = run_inference(
             file_path=file_path,
             filename=file.filename
@@ -100,7 +107,9 @@ async def predict(file: UploadFile = File(...)):
         )
 
     finally:
-        # Cleanup uploaded file
+        # -----------------------------
+        # Cleanup temporary file
+        # -----------------------------
         if os.path.exists(file_path):
             os.remove(file_path)
             log.info(f"Cleaned up file: {file_path}")
