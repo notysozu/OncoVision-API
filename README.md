@@ -13,7 +13,8 @@ model.
  cd ./backend/
 ```
 ```bash
-uvicorn app.main:app --reload```
+uvicorn app.main:app --reload
+```
 <br />
 ```
   --------------------------------------------------
